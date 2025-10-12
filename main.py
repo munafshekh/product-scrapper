@@ -18,11 +18,26 @@ headers = {
 }
 
 
+def data_found(request, name):
+    if request:
+        print(f"{name}  : {request.get_text().strip()}")
+    else:
+        print("Not found")
+
+def price_finder(price, fraction, name):
+    if price:
+        prc = float(f"{price.get_text().strip()}{fraction.get_text().strip()}")
+        print(f"{name}  : £{prc}")
+    else:
+        print("Not found")
+
+
+
 # x = requests.get('https://w3schools.com/python/demopage.htm').text
 # y = requests.get('https://google.com')
 
 try:
-    url_amz = 'https://www.amazon.com/YILUSHENGHUA-Moisture-Proof-Container-Countertop-Kaleidoscope/dp/B0FPBF3GD6/ref=sr_1_1?_encoding=UTF8&sr=8-1'
+    url_amz = 'https://www.amazon.co.uk/dp/B07Q6YSGF9/ref=sspa_dk_detail_0?psc=1&sp_csd=d2lkZ2V0TmFtZT1zcF9kZXRhaWxfdGhlbWF0aWM'
 
     amz_data = requests.get(url_amz, headers=headers, timeout=10)
     amz_data.raise_for_status() #Checks if request was successful
@@ -32,13 +47,31 @@ try:
     if amz_data.status_code == 200:
         soup = BeautifulSoup(amz_data.content, "html.parser")
 
+        # Logic testing
+        print(soup.prettify())
+        
 
-        # Logic for parsing
+        # Product essentials
         title = soup.find("span", {"id": "productTitle"})
-        if title:
-            print(f"Product Title : {title.get_text().strip()}")
-        else:
-            print("Product title not found")
+        data_found(title, "Product title")
+
+        rating = soup.find("span", {"class": "a-icon-alt"})
+        data_found(rating, "Rating")
+
+        total_rating = soup.find("span", {"id":"acrCustomerReviewText"})
+        data_found(total_rating, "Total Rating")
+
+        price = soup.find("span", {"class": "a-price-whole"})
+        fraction = soup.find("span", {"class": "a-price-fraction"})
+        price_finder(price, fraction, "Price")
+        
+        last_bought = soup.find("span", {"id":"social-proofing-faceout-title-tk_bought"})
+        data_found(last_bought, "Last bought")
+
+        # Product details
+        product_details = soup.find("h2", {"Product details"})
+        data_found(product_details, "Product details")
+        
         
     else:
         print(f"Recived status code : {amz_data.status_code}")
@@ -60,3 +93,5 @@ except requests.exceptions.RequestException as e:
 
 
 # print(soup.title)
+
+
